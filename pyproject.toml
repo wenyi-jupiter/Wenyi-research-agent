@@ -1,0 +1,59 @@
+[tool.poetry]
+name = "agent-engine"
+version = "0.1.0"
+description = "Multi-Agent Collaboration Execution Engine based on LangGraph"
+authors = ["Agent Demo"]
+readme = "README.md"
+packages = [{include = "agent_engine", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+langgraph = "^0.2"
+langgraph-checkpoint-postgres = "^2.0"
+langchain = "^0.3"
+langchain-core = "^0.3"
+langchain-openai = "^0.3"
+fastapi = "^0.115"
+uvicorn = {extras = ["standard"], version = "^0.32"}
+sqlalchemy = {extras = ["asyncio"], version = "^2.0"}
+asyncpg = "^0.31"
+pgvector = "^0.3"
+pydantic = "^2.0"
+pydantic-settings = "^2.0"
+httpx = "^0.28"
+tiktoken = "^0.12"
+tenacity = "^9.0"
+alembic = "^1.14"
+python-dotenv = "^1.0"
+aiofiles = "^24.1"
+duckduckgo-search = "^8.1.1"
+psutil = "^6.0"
+pymupdf = "^1.26"
+trafilatura = "^2.0"
+curl-cffi = ">=0.7"
+playwright = ">=1.40"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0"
+pytest-asyncio = "^0.24"
+pytest-cov = "^6.0"
+httpx = "^0.28"
+ruff = "^0.8"
+
+[tool.poetry.scripts]
+agent-engine = "agent_engine.main:run"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

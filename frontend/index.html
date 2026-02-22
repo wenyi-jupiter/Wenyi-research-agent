@@ -1,0 +1,2022 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WENYI AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 20px 0;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            color: white;
+        }
+
+        .brand {
+            font-size: 24px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 60px 20px;
+            transition: all 0.5s ease;
+        }
+
+        .welcome-section.hidden {
+            display: none;
+        }
+
+        .sparkle {
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .greeting {
+            font-size: 18px;
+            color: #a0a0a0;
+            margin-bottom: 8px;
+        }
+
+        .main-question {
+            font-size: 42px;
+            font-weight: 300;
+            color: #ffffff;
+            margin-bottom: 60px;
+            letter-spacing: -1px;
+        }
+
+        /* Input Section */
+        .input-section {
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .input-wrapper {
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 28px;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .input-wrapper:hover {
+            border-color: rgba(102, 126, 234, 0.5);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .input-wrapper:focus-within {
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .input-field {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            color: #ffffff;
+            font-family: inherit;
+        }
+
+        .input-field::placeholder {
+            color: #6b7280;
+        }
+
+        .submit-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .submit-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Results Section */
+        .results-section {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            padding: 20px 0;
+        }
+
+        .results-section.visible {
+            display: flex;
+        }
+
+        .task-header {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+        }
+
+        .task-request {
+            font-size: 18px;
+            font-weight: 500;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .task-status {
+            font-size: 14px;
+            color: #a0a0a0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #fbbf24;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .status-indicator.completed {
+            background: #10b981;
+            animation: none;
+        }
+
+        .status-indicator.error {
+            background: #ef4444;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 4px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            color: #9ca3af;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .tab-btn:hover {
+            color: #d1d5db;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn.active {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+        }
+
+        .tab-btn .badge {
+            background: rgba(102, 126, 234, 0.3);
+            color: #667eea;
+            font-size: 11px;
+            padding: 1px 6px;
+            border-radius: 10px;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .tab-content {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Steps Container */
+        .steps-container {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 24px;
+        }
+
+        .step-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .step-card:hover {
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .step-node {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .node-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .node-icon.planner {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .node-icon.executor {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .node-icon.critic {
+            background: rgba(249, 115, 22, 0.2);
+            color: #f97316;
+        }
+
+        .node-icon.reporter {
+            background: rgba(139, 92, 246, 0.2);
+            color: #8b5cf6;
+        }
+
+        .node-name {
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: capitalize;
+        }
+
+        .step-time {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .step-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #d1d5db;
+        }
+
+        .step-content pre {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+            overflow-x: auto;
+            font-size: 13px;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+        .subtasks-list {
+            margin-top: 12px;
+        }
+
+        .subtask-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .subtask-item:last-child {
+            border-bottom: none;
+        }
+
+        .subtask-status {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .subtask-status.pending {
+            background: rgba(107, 114, 128, 0.3);
+            color: #6b7280;
+        }
+
+        .subtask-status.completed {
+            background: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+
+        .subtask-status.in_progress {
+            background: rgba(59, 130, 246, 0.3);
+            color: #3b82f6;
+        }
+
+        .subtask-desc {
+            font-size: 13px;
+            color: #9ca3af;
+        }
+
+        /* Report Section */
+        .report-container {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 32px;
+        }
+
+        .report-content {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #e0e0e0;
+        }
+
+        .report-content h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 24px 0 16px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .report-content h1:first-child {
+            margin-top: 0;
+        }
+
+        .report-content h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #f0f0f0;
+            margin: 20px 0 12px 0;
+        }
+
+        .report-content h3 {
+            font-size: 17px;
+            font-weight: 600;
+            color: #e8e8e8;
+            margin: 16px 0 10px 0;
+        }
+
+        .report-content p {
+            margin: 10px 0;
+        }
+
+        .report-content ul, .report-content ol {
+            margin: 10px 0 10px 24px;
+        }
+
+        .report-content li {
+            margin: 4px 0;
+        }
+
+        .report-content a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .report-content a:hover {
+            text-decoration: underline;
+        }
+
+        .report-content blockquote {
+            border-left: 3px solid #667eea;
+            padding-left: 16px;
+            margin: 12px 0;
+            color: #a0a0a0;
+        }
+
+        .report-content code {
+            background: rgba(102, 126, 234, 0.15);
+            color: #a5b4fc;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .report-content pre {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+            overflow-x: auto;
+        }
+
+        .report-content pre code {
+            background: none;
+            padding: 0;
+        }
+
+        .report-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+        }
+
+        .report-content th, .report-content td {
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: left;
+        }
+
+        .report-content th {
+            background: rgba(102, 126, 234, 0.1);
+            font-weight: 600;
+        }
+
+        .report-placeholder {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .report-placeholder svg {
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* Tool Call Timeline */
+        .tool-timeline {
+            position: relative;
+        }
+
+        .tool-call-item {
+            display: flex;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        .tool-call-item:last-child {
+            border-bottom: none;
+        }
+
+        .tool-call-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 16px;
+        }
+
+        .tool-call-icon.success {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
+
+        .tool-call-icon.error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .tool-call-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .tool-call-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .tool-call-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #ffffff;
+        }
+
+        .tool-call-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .tool-call-time-tag {
+            background: rgba(255, 255, 255, 0.06);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .tool-call-subtask-tag {
+            background: rgba(102, 126, 234, 0.15);
+            color: #667eea;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .tool-call-args {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            color: #9ca3af;
+            margin-top: 6px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .tool-call-result {
+            margin-top: 6px;
+            font-size: 13px;
+            color: #9ca3af;
+            line-height: 1.5;
+        }
+
+        .tool-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6b7280;
+        }
+
+        /* Citations Panel */
+        .citations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .citation-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 14px 18px;
+            transition: all 0.2s ease;
+        }
+
+        .citation-card:hover {
+            border-color: rgba(102, 126, 234, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .citation-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .citation-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .citation-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .citation-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #e0e0e0;
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .citation-url {
+            font-size: 12px;
+            color: #667eea;
+            text-decoration: none;
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .citation-url:hover {
+            text-decoration: underline;
+        }
+
+        .citation-snippet {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 6px;
+            line-height: 1.5;
+        }
+
+        .citation-source {
+            font-size: 11px;
+            color: #4b5563;
+            margin-top: 4px;
+        }
+
+        .citations-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6b7280;
+        }
+
+        /* Metrics Bar */
+        .metrics-bar {
+            display: flex;
+            gap: 20px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .metric-item {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .metric-value {
+            color: #a0a0a0;
+            font-weight: 500;
+        }
+
+        /* New Task Button */
+        .new-task-btn {
+            margin-top: 24px;
+            padding: 14px 28px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            align-self: center;
+            font-family: inherit;
+        }
+
+        .new-task-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Loading Animation */
+        .loading-dots {
+            display: inline-flex;
+            gap: 4px;
+        }
+
+        .loading-dots span {
+            width: 6px;
+            height: 6px;
+            background: #667eea;
+            border-radius: 50%;
+            animation: bounce 1.4s ease-in-out infinite;
+        }
+
+        .loading-dots span:nth-child(1) { animation-delay: 0s; }
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-8px); }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Subtask Progress Tracker */
+        .subtask-tracker {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+        }
+
+        .tracker-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .tracker-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tracker-summary {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .tracker-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .tracker-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: all 0.3s ease;
+        }
+
+        .tracker-item.active {
+            border-color: rgba(59, 130, 246, 0.4);
+            background: rgba(59, 130, 246, 0.06);
+        }
+
+        .tracker-item.completed {
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .tracker-item.failed {
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .tracker-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+            margin-top: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .tracker-icon.pending {
+            background: rgba(107, 114, 128, 0.25);
+            color: #6b7280;
+        }
+
+        .tracker-icon.in_progress {
+            background: rgba(59, 130, 246, 0.25);
+            color: #3b82f6;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .tracker-icon.completed {
+            background: rgba(16, 185, 129, 0.25);
+            color: #10b981;
+        }
+
+        .tracker-icon.failed {
+            background: rgba(239, 68, 68, 0.25);
+            color: #ef4444;
+        }
+
+        .tracker-icon.skipped {
+            background: rgba(107, 114, 128, 0.15);
+            color: #4b5563;
+        }
+
+        .tracker-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .tracker-desc {
+            font-size: 13px;
+            color: #d1d5db;
+            line-height: 1.5;
+        }
+
+        .tracker-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 4px;
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        .tracker-meta .tag {
+            padding: 1px 6px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .tracker-meta .tag.tools {
+            background: rgba(16, 185, 129, 0.12);
+            color: #10b981;
+        }
+
+        .tracker-meta .tag.error {
+            background: rgba(239, 68, 68, 0.12);
+            color: #ef4444;
+        }
+
+        /* Subtask Stage Board */
+        .stage-board {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin-bottom: 14px;
+        }
+
+        .stage-board-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .stage-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .stage-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+
+        .stage-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            margin-top: 2px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+        }
+
+        .stage-dot.pending { background: rgba(107,114,128,0.25); color: #9ca3af; }
+        .stage-dot.in_progress { background: rgba(59,130,246,0.25); color: #60a5fa; }
+        .stage-dot.completed { background: rgba(16,185,129,0.25); color: #34d399; }
+        .stage-dot.failed { background: rgba(239,68,68,0.25); color: #f87171; }
+        .stage-dot.skipped { background: rgba(107,114,128,0.15); color: #6b7280; }
+
+        .stage-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .stage-title {
+            font-size: 13px;
+            color: #e5e7eb;
+            line-height: 1.5;
+        }
+
+        .stage-submeta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+            font-size: 11px;
+            color: #6b7280;
+            flex-wrap: wrap;
+        }
+
+        .stage-tag {
+            border-radius: 4px;
+            padding: 1px 6px;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .stage-tag.tools {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+        }
+
+        .stage-tag.warn {
+            background: rgba(251, 191, 36, 0.15);
+            color: #fbbf24;
+        }
+
+        .stage-tag.err {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+        }
+
+        /* Report Workflow */
+        .report-workflow {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+        }
+
+        .report-workflow-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .report-workflow-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .report-workflow-note {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #9ca3af;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 12px;
+            }
+            .main-question {
+                font-size: 28px;
+            }
+            .report-container {
+                padding: 20px;
+            }
+            .tab-btn {
+                font-size: 12px;
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">W</div>
+            <span class="brand">WENYI AI</span>
+        </header>
+
+        <!-- Welcome Section -->
+        <section class="welcome-section" id="welcomeSection">
+            <div class="sparkle">&#10024;</div>
+            <p class="greeting">Hi there</p>
+            <h1 class="main-question">Where Should We Start?</h1>
+
+            <div class="input-section">
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        class="input-field" 
+                        id="taskInput" 
+                        placeholder="&#36755;&#20837;&#20320;&#30340;&#20219;&#21153;&#35831;&#27714;..."
+                        autocomplete="off"
+                    >
+                    <button class="submit-btn" id="submitBtn" onclick="submitTask()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section class="results-section" id="resultsSection">
+            <div class="task-header">
+                <div class="task-request" id="taskRequest"></div>
+                <div class="task-status">
+                    <span class="status-indicator" id="statusIndicator"></span>
+                    <span id="statusText">&#27491;&#22312;&#22788;&#29702;...</span>
+                </div>
+                <div class="metrics-bar" id="metricsBar">
+                    <span class="metric-item">&#27493;&#39588;: <span class="metric-value" id="stepCount">0</span></span>
+                    <span class="metric-item">&#24037;&#20855;&#35843;&#29992;: <span class="metric-value" id="toolCount">0</span></span>
+                    <span class="metric-item">Tokens: <span class="metric-value" id="tokenCount">0</span></span>
+                    <span class="metric-item">&#24341;&#29992;&#28304;: <span class="metric-value" id="citationCount">0</span></span>
+                </div>
+            </div>
+
+            <!-- Subtask Progress Tracker -->
+            <div class="subtask-tracker" id="subtaskTracker" style="display:none">
+                <div class="tracker-header">
+                    <span class="tracker-title">&#23376;&#20219;&#21153;&#36827;&#24230;</span>
+                    <span class="tracker-summary" id="trackerSummary"></span>
+                </div>
+                <div class="tracker-list" id="trackerList"></div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="switchTab('process')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    &#25191;&#34892;&#36807;&#31243;
+                </button>
+                <button class="tab-btn" onclick="switchTab('report')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    &#26368;&#32456;&#25253;&#21578;
+                    <span class="badge" id="reportBadge" style="display:none">!</span>
+                </button>
+                <button class="tab-btn" onclick="switchTab('tools')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                    &#24037;&#20855;&#35843;&#29992;
+                    <span class="badge" id="toolsBadge">0</span>
+                </button>
+                <button class="tab-btn" onclick="switchTab('citations')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                    &#24341;&#29992;&#28304;
+                    <span class="badge" id="citationsBadge">0</span>
+                </button>
+            </div>
+
+            <!-- Tab Content: Process -->
+            <div class="tab-content active" id="tabProcess">
+                <div class="stage-board" id="subtaskStageBoard">
+                    <div class="stage-board-title">Subtask Execution Stages</div>
+                    <div class="stage-list" id="subtaskStageList">
+                        <div class="stage-item">
+                            <div class="stage-dot pending">.</div>
+                            <div class="stage-main">
+                                <div class="stage-title">Waiting for planner to create subtasks...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="steps-container" id="stepsContainer"></div>
+            </div>
+
+            <!-- Tab Content: Report -->
+            <div class="tab-content" id="tabReport">
+                <div class="report-container" id="reportContainer">
+                    <div class="report-workflow" id="reportWorkflow">
+                        <div class="report-workflow-title">Report Generation And Validation</div>
+                        <div class="report-workflow-list" id="reportWorkflowList"></div>
+                        <div class="report-workflow-note" id="reportWorkflowNote">Waiting for reporter stage...</div>
+                    </div>
+                    <div class="report-placeholder" id="reportPlaceholder">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                        </svg>
+                        <p>&#25253;&#21578;&#29983;&#25104;&#20013;&#65292;&#35831;&#31561;&#24453;&#20219;&#21153;&#23436;&#25104;...</p>
+                    </div>
+                    <div class="report-content" id="reportContent" style="display:none"></div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Tools -->
+            <div class="tab-content" id="tabTools">
+                <div class="tool-timeline" id="toolTimeline">
+                    <div class="tool-empty" id="toolEmpty">
+                        <p>&#26242;&#26080;&#24037;&#20855;&#35843;&#29992;&#35760;&#24405;</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Citations -->
+            <div class="tab-content" id="tabCitations">
+                <div class="citations-list" id="citationsList">
+                    <div class="citations-empty" id="citationsEmpty">
+                        <p>&#26242;&#26080;&#24341;&#29992;&#28304;</p>
+                    </div>
+                </div>
+            </div>
+
+            <button class="new-task-btn" id="newTaskBtn" onclick="resetUI()" style="display: none;">
+                &#24320;&#22987;&#26032;&#20219;&#21153;
+            </button>
+        </section>
+    </div>
+
+    <script>
+        window.addEventListener('error', (e) => {
+            console.error('Global error:', e.message);
+            const btn = document.getElementById('submitBtn');
+            if (btn) btn.disabled = false;
+        });
+
+        // Auto-detect API port from current page URL, fallback to 8000
+        const API_PORT = window.location.port || '8000';
+        const API_BASE = `http://localhost:${API_PORT}`;
+        let ws = null;
+        let taskId = null;
+        let stepCounter = 0;
+        let allToolCalls = [];
+        let allCitations = [];
+        let finalReport = '';
+        let _processedSeqs = new Set();
+        // 鈹€鈹€ Subtask tracking state 鈹€鈹€
+        let _subtaskList = [];        // Latest subtask list from backend
+        let _currentIteration = 0;    // Current iteration (for dedup across replans)
+        let _lastExecutorSubtaskId = null;  // Dedup: last executor subtask shown in process log
+        let _lastCriticIteration = -1;      // Dedup: last critic iteration shown
+        let _lastReporterShown = false;     // Dedup: reporter shown flag
+        let _reportWorkflow = null;         // Report generation/validation workflow state
+
+        // Configure marked for safe rendering
+        try {
+            if (typeof marked !== 'undefined' && marked.setOptions) {
+                marked.setOptions({ breaks: true, gfm: true });
+            }
+        } catch (e) {
+            console.warn('marked.setOptions not available:', e.message);
+        }
+
+        // Handle Enter key
+        document.getElementById('taskInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') submitTask();
+        });
+
+        async function submitTask() {
+            const input = document.getElementById('taskInput');
+            const request = input.value.trim();
+            if (!request) return;
+
+            taskId = 'task_' + Math.random().toString(36).substr(2, 12);
+            stepCounter = 0;
+            allToolCalls = [];
+            allCitations = [];
+            finalReport = '';
+            _subtaskList = [];
+            _currentIteration = 0;
+            _lastExecutorSubtaskId = null;
+            _lastCriticIteration = -1;
+            _lastReporterShown = false;
+            initReportWorkflow();
+
+            document.getElementById('welcomeSection').classList.add('hidden');
+            document.getElementById('resultsSection').classList.add('visible');
+            document.getElementById('taskRequest').textContent = request;
+            document.getElementById('stepsContainer').innerHTML = '';
+            document.getElementById('newTaskBtn').style.display = 'none';
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('subtaskTracker').style.display = 'none';
+            document.getElementById('trackerList').innerHTML = '';
+            resetSubtaskStageBoard();
+
+            switchTab('process');
+            document.getElementById('reportContent').style.display = 'none';
+            document.getElementById('reportPlaceholder').style.display = 'block';
+            document.getElementById('reportBadge').style.display = 'none';
+            resetToolTimeline();
+            resetCitationsList();
+
+            connectWebSocket(request);
+        }
+
+        function connectWebSocket(request) {
+            if (ws) {
+                ws.onclose = null;
+                ws.onerror = null;
+                ws.close();
+                ws = null;
+            }
+            _processedSeqs.clear();
+
+            const wsUrl = `ws://localhost:${API_PORT}/ws/tasks/${taskId}/stream`;
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+                ws.send(JSON.stringify({ command: 'start', request: request }));
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                handleMessage(data);
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                updateStatus('error', '连接错误');
+                fallbackToRestAPI(request);
+            };
+
+            ws.onclose = () => { console.log('WebSocket closed'); };
+        }
+
+        async function fallbackToRestAPI(request) {
+            try {
+                addStep('system', '切换到 REST API 模式...', '');
+                const response = await fetch(`${API_BASE}/api/v1/tasks`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ request: request })
+                });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                handleRestResult(await response.json());
+            } catch (error) {
+                console.error('REST API error:', error);
+                updateStatus('error', '任务执行失败: ' + error.message);
+                failReportWorkflow(error.message || 'REST API error');
+                document.getElementById('newTaskBtn').style.display = 'block';
+                document.getElementById('submitBtn').disabled = false;
+            }
+        }
+
+        // Message handling (with deduplication)
+
+        function handleMessage(data) {
+            console.log('Received:', data);
+
+            if (data.seq) {
+                if (_processedSeqs.has(data.seq)) {
+                    console.warn('Duplicate seq=' + data.seq + ', skipping');
+                    return;
+                }
+                _processedSeqs.add(data.seq);
+            }
+
+            // Track iteration for dedup
+            if (data.iteration !== undefined) {
+                _currentIteration = data.iteration;
+            }
+
+            // Always update subtask tracker from every event that carries subtasks
+            if (data.subtasks && data.subtasks.length > 0) {
+                updateSubtaskTracker(data.subtasks, data.current_subtask);
+            }
+
+            switch (data.type) {
+                case 'connected':
+                    addStep('system', '已连接到 Agent 引擎', data.timestamp);
+                    break;
+
+                case 'status':
+                    updateStatus('running', data.message || '正在处理...');
+                    break;
+
+                case 'planning':
+                    handlePlanningStep(data);
+                    break;
+
+                case 'executing':
+                    handleExecutingStep(data);
+                    break;
+
+                case 'reviewing':
+                    handleReviewingStep(data);
+                    break;
+
+                case 'report':
+                    handleReportStep(data);
+                    break;
+
+                case 'step':
+                    handleGenericStep(data);
+                    break;
+
+                case 'completed':
+                    updateStatus('completed', '任务完成');
+                    if (data.final_report) {
+                        finalReport = data.final_report;
+                        renderReport(data.final_report);
+                        document.getElementById('reportBadge').style.display = 'inline';
+                        completeReportWorkflow(data.timestamp, data.report_process_message || '');
+                    }
+                    if (data.citations && data.citations.length > 0) updateCitations(data.citations);
+                    if (data.tool_call_log && data.tool_call_log.length > 0) updateToolCallLog(data.tool_call_log);
+                    // Final subtask state
+                    if (data.subtasks) updateSubtaskTracker(data.subtasks, null);
+                    document.getElementById('newTaskBtn').style.display = 'block';
+                    document.getElementById('submitBtn').disabled = false;
+                    if (finalReport) switchTab('report');
+                    break;
+
+                case 'error':
+                    updateStatus('error', '错误: ' + data.message);
+                    failReportWorkflow(data.message || '');
+                    document.getElementById('newTaskBtn').style.display = 'block';
+                    document.getElementById('submitBtn').disabled = false;
+                    break;
+            }
+
+            // Update metrics
+            if (data.step_count !== undefined) document.getElementById('stepCount').textContent = data.step_count;
+            if (data.total_tokens !== undefined && data.total_tokens > 0) document.getElementById('tokenCount').textContent = data.total_tokens;
+            if (data.tool_call_count !== undefined && data.tool_call_count > 0) document.getElementById('toolCount').textContent = data.tool_call_count;
+            if (data.tool_call_log && data.tool_call_log.length > 0) updateToolCallLog(data.tool_call_log);
+            if (data.citations && data.citations.length > 0) updateCitations(data.citations);
+        }
+
+        // Subtask Progress Tracker
+
+        function updateSubtaskTracker(subtasks, currentSubtask) {
+            _subtaskList = subtasks;
+            const tracker = document.getElementById('subtaskTracker');
+            const list = document.getElementById('trackerList');
+            const summary = document.getElementById('trackerSummary');
+
+            if (!subtasks || subtasks.length === 0) {
+                tracker.style.display = 'none';
+                resetSubtaskStageBoard();
+                return;
+            }
+            tracker.style.display = 'block';
+
+            const completed = subtasks.filter(s => s.status === 'completed').length;
+            const failed = subtasks.filter(s => s.status === 'failed').length;
+            const inProgress = subtasks.filter(s => s.status === 'in_progress').length;
+            const total = subtasks.length;
+            summary.textContent = `${completed}/${total} 完成` +
+                (failed > 0 ? ` | ${failed} 失败` : '') +
+                (inProgress > 0 ? ` | ${inProgress} 执行中` : '');
+
+            let html = '';
+            subtasks.forEach((st, i) => {
+                const status = st.status || 'pending';
+                const isCurrent = currentSubtask && st.id === currentSubtask.id;
+                const activeClass = (status === 'in_progress' || isCurrent) ? ' active' : '';
+                const statusClass = status === 'completed' ? ' completed' : status === 'failed' ? ' failed' : '';
+
+                const icons = {
+                    'pending': '.',
+                    'in_progress': '>',
+                    'completed': '+',
+                    'failed': '!',
+                    'skipped': '~',
+                };
+
+                // Build meta tags
+                let metaHtml = '';
+                if (st.result && typeof st.result === 'object' && st.result.tool_results) {
+                    const toolCount = st.result.tool_results.length;
+                    metaHtml += `<span class="tag tools">${toolCount} 工具调用</span>`;
+                }
+                if (st._reused) {
+                    metaHtml += `<span class="tag" style="background:rgba(16,185,129,0.12);color:#10b981;">复用</span>`;
+                }
+                if (st.error) {
+                    metaHtml += `<span class="tag error">错误</span>`;
+                }
+                if (st.quality_warnings && st.quality_warnings.length > 0) {
+                    metaHtml += `<span class="tag" style="background:rgba(251,191,36,0.12);color:#fbbf24;">质量警告</span>`;
+                }
+
+                html += `
+                    <div class="tracker-item${activeClass}${statusClass}">
+                        <div class="tracker-icon ${status}">${icons[status] || '?'}</div>
+                        <div class="tracker-body">
+                            <div class="tracker-desc">${escapeHtml(st.description || '')}</div>
+                            ${metaHtml ? `<div class="tracker-meta">${metaHtml}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+            renderSubtaskStageBoard(subtasks, currentSubtask);
+        }
+
+        function resetSubtaskStageBoard() {
+            const el = document.getElementById('subtaskStageList');
+            if (!el) return;
+            el.innerHTML = `
+                <div class="stage-item">
+                    <div class="stage-dot pending">.</div>
+                    <div class="stage-main">
+                        <div class="stage-title">等待 planner 生成子任务...</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSubtaskStageBoard(subtasks, currentSubtask) {
+            const el = document.getElementById('subtaskStageList');
+            if (!el) return;
+
+            if (!subtasks || subtasks.length === 0) {
+                resetSubtaskStageBoard();
+                return;
+            }
+
+            const iconMap = {
+                pending: '.',
+                in_progress: '>',
+                completed: '+',
+                failed: '!',
+                skipped: '~',
+            };
+
+            const statusLabelMap = {
+                pending: '待执行',
+                in_progress: '执行中',
+                completed: '已完成',
+                failed: '失败',
+                skipped: '跳过',
+            };
+
+            let html = '';
+            subtasks.forEach((st, idx) => {
+                const status = st.status || (currentSubtask && currentSubtask.id === st.id ? 'in_progress' : 'pending');
+                const icon = iconMap[status] || '.';
+                const statusLabel = statusLabelMap[status] || status;
+                const toolCount = st?.result?.tool_results?.length || 0;
+                const warningCount = st?.quality_warnings?.length || 0;
+
+                let tags = `<span class="stage-tag">${escapeHtml(statusLabel)}</span>`;
+                if (toolCount > 0) {
+                    tags += `<span class="stage-tag tools">${toolCount} 次工具调用</span>`;
+                }
+                if (warningCount > 0) {
+                    tags += `<span class="stage-tag warn">${warningCount} 条质量警告</span>`;
+                }
+                if (st.error) {
+                    tags += `<span class="stage-tag err">错误</span>`;
+                }
+                if (st._reused) {
+                    tags += `<span class="stage-tag">复用</span>`;
+                }
+
+                html += `
+                    <div class="stage-item">
+                        <div class="stage-dot ${status}">${icon}</div>
+                        <div class="stage-main">
+                            <div class="stage-title">S${idx + 1} - ${escapeHtml(st.description || '')}</div>
+                            <div class="stage-submeta">${tags}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            el.innerHTML = html;
+        }
+
+        // Step handlers (with dedup for iterations)
+
+        function handlePlanningStep(data) {
+            const subtasks = data.subtasks || (data.current_subtask ? [data.current_subtask] : []);
+            let content = '正在生成执行计划...';
+            if (subtasks.length > 0) {
+                content = `<strong>已规划 ${subtasks.length} 个子任务</strong>`;
+            }
+
+            // Show replan badge ONLY if iteration > 0 (meaning critic already ran)
+            if (_currentIteration > 0) {
+                content += ` <span style="font-size:11px;color:#667eea;margin-left:8px;background:rgba(102,126,234,0.15);padding:2px 8px;border-radius:4px;">重新规划（第 ${_currentIteration} 轮）</span>`;
+                // Reset executor dedup for new iteration
+                _lastExecutorSubtaskId = null;
+            }
+
+            addStep('planner', content, data.timestamp);
+        }
+
+        function handleExecutingStep(data) {
+            const subtaskDesc = data.current_subtask ? data.current_subtask.description : '执行子任务...';
+
+            // Check if this subtask was reused from a previous iteration
+            const subtaskStatus = data.current_subtask ? data.current_subtask.status : '';
+            const isReused = subtaskStatus === 'completed' && (!data.tool_calls || data.tool_calls.length === 0);
+
+            let content = `<strong>执行:</strong> ${escapeHtml(subtaskDesc)}`;
+
+            if (isReused && data.current_subtask && data.current_subtask.result) {
+                // Reused from previous iteration
+                content += '<div style="margin-top:6px;font-size:12px;color:#10b981;font-style:italic;">已复用上一轮已完成结果（节省预算）</div>';
+            } else if (data.tool_calls && data.tool_calls.length > 0) {
+                content += '<pre>';
+                data.tool_calls.forEach(tc => {
+                    content += `工具: ${escapeHtml(tc.tool_name)}\n`;
+                    content += `参数: ${escapeHtml(JSON.stringify(tc.args, null, 2))}\n`;
+                    if (tc.result) {
+                        const resultStr = JSON.stringify(tc.result, null, 2);
+                        content += `结果: ${escapeHtml(resultStr.substring(0, 200))}...\n`;
+                    }
+                });
+                content += '</pre>';
+            } else {
+                // No tool calls 鈥?show that LLM answered directly
+                content += '<div style="margin-top:6px;font-size:12px;color:#6b7280;font-style:italic;">LLM 直接回答（无工具调用）</div>';
+            }
+
+            addStep('executor', content, data.timestamp);
+        }
+
+        function handleReviewingStep(data) {
+            // Dedup: only show one critic card per iteration
+            if (_lastCriticIteration === _currentIteration) {
+                console.log('Dedup: skipping duplicate critic for iteration ' + _currentIteration);
+                return;
+            }
+            _lastCriticIteration = _currentIteration;
+
+            let content = '正在评估执行结果...';
+            if (data.feedback) {
+                const fb = data.feedback;
+                content = `<strong>评估结果:</strong><br>`;
+                content += `<div style="margin-top:8px;">`;
+                content += `<div style="margin-bottom:6px;">完整性: <span style="color:${fb.is_complete ? '#10b981' : '#ef4444'}">${fb.is_complete ? '通过' : '未通过'}</span></div>`;
+                content += `<div style="margin-bottom:6px;">正确性: <span style="color:${fb.is_correct ? '#10b981' : '#ef4444'}">${fb.is_correct ? '通过' : '需修正'}</span></div>`;
+                if (fb.confidence !== undefined) {
+                    const pct = Math.round(fb.confidence * 100);
+                    content += `<div style="margin-bottom:6px;">置信度: <span style="color:#667eea">${pct}%</span></div>`;
+                }
+                if (fb.feedback) {
+                    content += `<div style="margin-top:10px;padding:10px;background:rgba(255,255,255,0.05);border-radius:6px;font-size:13px;line-height:1.6;">`;
+                    content += `<strong>详细反馈:</strong><br>${escapeHtml(fb.feedback)}</div>`;
+                }
+                if (fb.suggestions && fb.suggestions.length > 0) {
+                    content += `<div style="margin-top:10px;"><strong>改进建议:</strong><ul style="margin-top:6px;padding-left:20px;">`;
+                    fb.suggestions.forEach(s => { content += `<li style="margin-bottom:4px;">${escapeHtml(String(s))}</li>`; });
+                    content += `</ul></div>`;
+                }
+                if (fb.needs_revision !== undefined) {
+                    content += `<div style="margin-top:8px;padding:8px;background:${fb.needs_revision ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)'};border-radius:6px;font-size:12px;">`;
+                    content += `需要重做: ${fb.needs_revision ? '是' : '否'}</div>`;
+                }
+                content += `</div>`;
+            } else if (data.evaluation_message) {
+                content = `<strong>评估结果:</strong><br>`;
+                content += `<pre style="margin-top:8px;background:rgba(0,0,0,0.3);padding:10px;border-radius:6px;font-size:12px;overflow-x:auto;">${escapeHtml(data.evaluation_message)}</pre>`;
+            }
+
+            addStep('critic', content, data.timestamp);
+        }
+
+        function handleReportStep(data) {
+            setReportWorkflowInProgress(data.timestamp);
+
+            // Dedup: only show reporter once
+            if (_lastReporterShown) {
+                console.log('Dedup: skipping duplicate reporter');
+                return;
+            }
+            _lastReporterShown = true;
+
+            addStep('reporter', '正在生成最终报告并执行引用校验...', data.timestamp);
+            if (data.final_report) {
+                finalReport = data.final_report;
+                renderReport(data.final_report);
+                document.getElementById('reportBadge').style.display = 'inline';
+                completeReportWorkflow(data.timestamp, data.report_process_message || '');
+            }
+        }
+
+        function handleGenericStep(data) {
+            const content = data.message || JSON.stringify(data, null, 2);
+            addStep(data.node || 'system', content, data.timestamp);
+        }
+
+        function handleRestResult(result) {
+            if (result.subtasks && result.subtasks.length > 0) {
+                updateSubtaskTracker(result.subtasks, null);
+            }
+            if (result.metrics) {
+                document.getElementById('stepCount').textContent = result.metrics.step_count || 0;
+                document.getElementById('toolCount').textContent = result.metrics.tool_call_count || 0;
+                document.getElementById('tokenCount').textContent = result.metrics.total_tokens || 0;
+            }
+            if (result.final_report) {
+                finalReport = result.final_report;
+                renderReport(result.final_report);
+                document.getElementById('reportBadge').style.display = 'inline';
+                completeReportWorkflow(new Date().toISOString(), result.report_process_message || '');
+            }
+            if (result.tool_call_log && result.tool_call_log.length > 0) updateToolCallLog(result.tool_call_log);
+            if (result.citations && result.citations.length > 0) updateCitations(result.citations);
+            if (result.status === 'completed' || result.status === 'reviewing') {
+                updateStatus('completed', '任务完成');
+                if (finalReport) switchTab('report');
+            } else if (result.error) {
+                updateStatus('error', result.error);
+                failReportWorkflow(result.error);
+            }
+            document.getElementById('newTaskBtn').style.display = 'block';
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        // Report Rendering
+
+        function initReportWorkflow() {
+            _reportWorkflow = {
+                generation: { status: 'pending', time: '' },
+                validation: { status: 'pending', time: '' },
+                references: { status: 'pending', time: '' },
+                note: '等待 reporter 阶段开始...'
+            };
+            renderReportWorkflow();
+        }
+
+        function setReportWorkflowInProgress(timestamp) {
+            if (!_reportWorkflow) initReportWorkflow();
+            const t = timestamp ? new Date(timestamp).toLocaleTimeString() : '';
+            _reportWorkflow.generation.status = 'in_progress';
+            _reportWorkflow.generation.time = t;
+            _reportWorkflow.note = 'Reporter 已启动，正在调用 LLM 生成报告...';
+            renderReportWorkflow();
+        }
+
+        function completeReportWorkflow(timestamp, processMessage) {
+            if (!_reportWorkflow) initReportWorkflow();
+            const t = timestamp ? new Date(timestamp).toLocaleTimeString() : '';
+            _reportWorkflow.generation = { status: 'completed', time: t };
+            _reportWorkflow.validation = { status: 'completed', time: t };
+            _reportWorkflow.references = { status: 'completed', time: t };
+            _reportWorkflow.note = processMessage
+                ? String(processMessage)
+                : '报告已完成：LLM 生成 -> claim-source 校验 -> 引用重建。';
+            renderReportWorkflow();
+        }
+
+        function failReportWorkflow(message) {
+            if (!_reportWorkflow) initReportWorkflow();
+            if (_reportWorkflow.generation.status !== 'completed') _reportWorkflow.generation.status = 'failed';
+            if (_reportWorkflow.validation.status !== 'completed') _reportWorkflow.validation.status = 'failed';
+            if (_reportWorkflow.references.status !== 'completed') _reportWorkflow.references.status = 'failed';
+            _reportWorkflow.note = message ? `失败原因: ${message}` : 'Reporter 阶段失败。';
+            renderReportWorkflow();
+        }
+
+        function renderReportWorkflow() {
+            const listEl = document.getElementById('reportWorkflowList');
+            const noteEl = document.getElementById('reportWorkflowNote');
+            if (!listEl || !noteEl) return;
+
+            if (!_reportWorkflow) {
+                listEl.innerHTML = '';
+                noteEl.textContent = '等待 reporter 阶段开始...';
+                return;
+            }
+
+            const iconMap = { pending: '.', in_progress: '>', completed: '+', failed: '!' };
+            const labelMap = { pending: '待执行', in_progress: '执行中', completed: '已完成', failed: '失败' };
+            const rows = [
+                { key: 'generation', title: '报告生成（LLM）' },
+                { key: 'validation', title: '引用一致性校验（Claim-Source）' },
+                { key: 'references', title: '引用重建（仅保留使用过的来源）' },
+            ];
+
+            let html = '';
+            rows.forEach(row => {
+                const item = _reportWorkflow[row.key] || { status: 'pending', time: '' };
+                const st = item.status || 'pending';
+                const icon = iconMap[st] || '.';
+                const label = labelMap[st] || st;
+                html += `
+                    <div class="stage-item">
+                        <div class="stage-dot ${st}">${icon}</div>
+                        <div class="stage-main">
+                            <div class="stage-title">${row.title}</div>
+                            <div class="stage-submeta">
+                                <span class="stage-tag">${label}</span>
+                                ${item.time ? `<span class="stage-tag">${escapeHtml(item.time)}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            listEl.innerHTML = html;
+            noteEl.textContent = _reportWorkflow.note || '';
+        }
+
+        function renderReport(markdown) {
+            const container = document.getElementById('reportContent');
+            const placeholder = document.getElementById('reportPlaceholder');
+            if (typeof marked !== 'undefined') {
+                container.innerHTML = marked.parse(markdown);
+            } else {
+                container.innerHTML = `<pre style="white-space:pre-wrap;">${escapeHtml(markdown)}</pre>`;
+            }
+            placeholder.style.display = 'none';
+            container.style.display = 'block';
+        }
+
+        // Tool Call Timeline
+
+        function updateToolCallLog(toolCalls) {
+            toolCalls.forEach(tc => {
+                const exists = allToolCalls.some(
+                    existing => existing.timestamp === tc.timestamp && existing.tool_name === tc.tool_name
+                );
+                if (!exists) allToolCalls.push(tc);
+            });
+            renderToolTimeline();
+        }
+
+        function renderToolTimeline() {
+            const container = document.getElementById('toolTimeline');
+            const emptyMsg = document.getElementById('toolEmpty');
+            if (allToolCalls.length === 0) { emptyMsg.style.display = 'block'; return; }
+            emptyMsg.style.display = 'none';
+
+            let html = '';
+            allToolCalls.forEach(tc => {
+                const iconClass = tc.success ? 'success' : 'error';
+                const icon = tc.success ? '+' : '!';
+                const time = tc.timestamp ? new Date(tc.timestamp).toLocaleTimeString() : '';
+                const execTime = tc.execution_time_ms ? `${Math.round(tc.execution_time_ms)}ms` : '';
+                const argsStr = tc.args ? JSON.stringify(tc.args, null, 2) : '{}';
+                html += `
+                    <div class="tool-call-item">
+                        <div class="tool-call-icon ${iconClass}">${icon}</div>
+                        <div class="tool-call-body">
+                            <div class="tool-call-header">
+                                <span class="tool-call-name">${escapeHtml(tc.tool_name)}</span>
+                                <div class="tool-call-meta">
+                                    ${tc.subtask_id ? `<span class="tool-call-subtask-tag">${escapeHtml(tc.subtask_id)}</span>` : ''}
+                                    ${execTime ? `<span class="tool-call-time-tag">${execTime}</span>` : ''}
+                                    <span>${time}</span>
+                                </div>
+                            </div>
+                            <div class="tool-call-args">${escapeHtml(argsStr)}</div>
+                            ${tc.result_summary ? `<div class="tool-call-result">${escapeHtml(tc.result_summary.substring(0, 200))}${tc.result_summary.length > 200 ? '...' : ''}</div>` : ''}
+                        </div>
+                    </div>`;
+            });
+            container.innerHTML = html + '<div class="tool-empty" id="toolEmpty" style="display:none"><p>暂无工具调用记录</p></div>';
+            document.getElementById('toolsBadge').textContent = allToolCalls.length;
+            document.getElementById('toolCount').textContent = allToolCalls.length;
+        }
+
+        function resetToolTimeline() {
+            allToolCalls = [];
+            document.getElementById('toolTimeline').innerHTML = '<div class="tool-empty" id="toolEmpty"><p>暂无工具调用记录</p></div>';
+            document.getElementById('toolsBadge').textContent = '0';
+        }
+
+        // Citations Panel
+
+        function updateCitations(citations) {
+            allCitations = citations;
+            renderCitations();
+        }
+
+        function renderCitations() {
+            const container = document.getElementById('citationsList');
+            const emptyMsg = document.getElementById('citationsEmpty');
+            if (allCitations.length === 0) { emptyMsg.style.display = 'block'; return; }
+            emptyMsg.style.display = 'none';
+
+            const verifiedCount = allCitations.filter(c => c.verified === true).length;
+            const unverifiedCount = allCitations.filter(c => c.verified === false).length;
+            let html = '';
+            if (allCitations.some(c => c.verified !== undefined)) {
+                html += `<div style="display:flex;gap:12px;margin-bottom:16px;font-size:13px;color:#9ca3af;">
+                    <span style="color:#10b981;">已验证 ${verifiedCount} 条</span>
+                    ${unverifiedCount > 0 ? `<span style="color:#ef4444;">未验证 ${unverifiedCount} 条</span>` : ''}
+                </div>`;
+            }
+            allCitations.forEach(c => {
+                let title = '';
+                try { title = c.title || (c.url ? new URL(c.url).hostname : '未知来源'); }
+                catch(e) { title = c.title || '未知来源'; }
+                const sourceLabel = { 'web_search': '网页搜索', 'fetch_url': 'URL 抓取', 'llm_builtin_search': 'AI 内置搜索' }[c.source_tool] || c.source_tool;
+                const isVerified = c.verified === true;
+                const verifiedBadge = c.verified === true
+                    ? '<span style="color:#10b981;font-size:11px;margin-left:8px;background:rgba(16,185,129,0.15);padding:1px 6px;border-radius:4px;">已验证</span>'
+                    : c.verified === false ? '<span style="color:#ef4444;font-size:11px;margin-left:8px;background:rgba(239,68,68,0.15);padding:1px 6px;border-radius:4px;">未验证</span>' : '';
+                const cardBorder = isVerified ? 'border-color:rgba(16,185,129,0.2);' : c.verified === false ? 'border-color:rgba(239,68,68,0.15);opacity:0.7;' : '';
+                html += `
+                    <div class="citation-card" style="${cardBorder}">
+                        <div class="citation-header">
+                            <span class="citation-number">${c.id}</span>
+                            <div class="citation-info">
+                                <div class="citation-title">${escapeHtml(title)}${verifiedBadge}</div>
+                                ${c.url ? `<a class="citation-url" href="${escapeHtml(c.url)}" target="_blank" rel="noopener">${escapeHtml(c.url)}</a>` : ''}
+                                ${c.snippet ? `<div class="citation-snippet">${escapeHtml(c.snippet.substring(0, 300))}</div>` : ''}
+                                <div class="citation-source">来源: ${escapeHtml(sourceLabel)}${c.http_status ? ` | HTTP ${c.http_status}` : ''}</div>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+            container.innerHTML = html + '<div class="citations-empty" id="citationsEmpty" style="display:none"><p>暂无引用来源</p></div>';
+            document.getElementById('citationsBadge').textContent = allCitations.length;
+            document.getElementById('citationCount').textContent = verifiedCount > 0 ? `${verifiedCount}/${allCitations.length}` : allCitations.length;
+        }
+
+        function resetCitationsList() {
+            allCitations = [];
+            document.getElementById('citationsList').innerHTML = '<div class="citations-empty" id="citationsEmpty"><p>暂无引用来源</p></div>';
+            document.getElementById('citationsBadge').textContent = '0';
+            document.getElementById('citationCount').textContent = '0';
+        }
+
+        // Tab Switching
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            const tabMap = { 'process': 'tabProcess', 'report': 'tabReport', 'tools': 'tabTools', 'citations': 'tabCitations' };
+            document.getElementById(tabMap[tabName]).classList.add('active');
+            const buttons = document.querySelectorAll('.tab-btn');
+            const tabIndex = { 'process': 0, 'report': 1, 'tools': 2, 'citations': 3 };
+            buttons[tabIndex[tabName]].classList.add('active');
+        }
+
+        // Utility Functions
+
+        function addStep(nodeType, content, timestamp) {
+            stepCounter++;
+            const container = document.getElementById('stepsContainer');
+            const icons = {
+                'planner': 'P',
+                'executor': 'E',
+                'critic': 'C',
+                'reporter': 'R',
+                'system': 'S'
+            };
+            const time = timestamp ? new Date(timestamp).toLocaleTimeString() : '';
+            const stepHtml = `
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-node">
+                            <span class="node-icon ${nodeType}">${icons[nodeType] || 'N'}</span>
+                            <span class="node-name">${nodeType}</span>
+                        </div>
+                        <span class="step-time">${time}</span>
+                    </div>
+                    <div class="step-content">${content}</div>
+                </div>`;
+            container.insertAdjacentHTML('beforeend', stepHtml);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function updateStatus(status, text) {
+            const indicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            indicator.className = 'status-indicator';
+            if (status === 'completed') indicator.classList.add('completed');
+            else if (status === 'error') indicator.classList.add('error');
+            statusText.textContent = text;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.appendChild(document.createTextNode(text));
+            return div.innerHTML;
+        }
+
+        function resetUI() {
+            document.getElementById('welcomeSection').classList.remove('hidden');
+            document.getElementById('resultsSection').classList.remove('visible');
+            document.getElementById('taskInput').value = '';
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('stepsContainer').innerHTML = '';
+            document.getElementById('stepCount').textContent = '0';
+            document.getElementById('toolCount').textContent = '0';
+            document.getElementById('tokenCount').textContent = '0';
+            document.getElementById('citationCount').textContent = '0';
+            document.getElementById('subtaskTracker').style.display = 'none';
+            finalReport = '';
+            allToolCalls = [];
+            allCitations = [];
+            _subtaskList = [];
+            _currentIteration = 0;
+            _lastExecutorSubtaskId = null;
+            _lastCriticIteration = -1;
+            _lastReporterShown = false;
+            initReportWorkflow();
+            resetSubtaskStageBoard();
+            if (ws) { ws.close(); ws = null; }
+        }
+
+        // Initialize stage panels on first load
+        initReportWorkflow();
+        resetSubtaskStageBoard();
+    </script>
+</body>
+</html>
