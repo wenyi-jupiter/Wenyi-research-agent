@@ -269,6 +269,11 @@ poetry run agent-engine
 | `scripts/validate_pdf_fetch.py` | 验证 PDF fetch 与内容提取 |
 
 ---
+<img width="1738" height="1309" alt="image" src="https://github.com/user-attachments/assets/b207781c-e6c4-41b8-92f0-f5fece68c7c8" />
+<img width="1763" height="1251" alt="image" src="https://github.com/user-attachments/assets/3ca81018-0198-43cd-a4a0-d597a6f8a400" />
+<img width="1615" height="1271" alt="image" src="https://github.com/user-attachments/assets/ebeb72d5-afa7-4a94-8998-a929801e28b8" />
+
+
 
 ## License
 
